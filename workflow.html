@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JetBrains WebStorm + Junie AI Workflow — C9 DraftForge</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='9' fill='%2311211b'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23ecc982' font-family='Georgia,serif' font-weight='700' font-size='16'%3EDF%3C/text%3E%3C/svg%3E" />
+    <meta
+      name="description"
+      content="How C9 DraftForge was engineered with JetBrains WebStorm, Junie CLI (session-261120-022709-1mth), and JetBrains Air for the Cloud9 x JetBrains Hackathon 2026 Bonus Prize."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="index.html">
+          <div class="brand-mark">DF</div>
+          <div class="brand-text">
+            <span class="brand-name">C9 DraftForge</span>
+            <span class="brand-sub">JetBrains WebStorm · Junie CLI · Air</span>
+          </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-link" href="index.html#fearless-desk">Fearless Draft</a>
+          <a class="nav-link" href="index.html#macro-scouting">Macro Scouting</a>
+          <a class="nav-link" href="index.html#pool-fatigue">Pool Fatigue</a>
+          <a class="nav-link active" href="workflow.html">JetBrains + Junie Story</a>
+        </nav>
+
+        <div class="topbar-actions">
+          <a class="btn btn-sm btn-primary" href="index.html">&larr; Back to Draft Desk</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-frame">
+            <div class="hero-backdrop" aria-hidden="true">
+              <img src="assets/lol/splashes/Orianna_0.jpg" alt="" />
+              <img src="assets/lol/splashes/Vi_0.jpg" alt="" />
+            </div>
+            <div class="hero-scrim" aria-hidden="true"></div>
+            <div class="hero-content">
+              <div>
+                <div class="hero-kicker">
+                  <span class="hero-kicker-dot"></span>
+                  <span>$1,000 JetBrains AI Workflow Bonus · Verified Session Telemetry</span>
+                </div>
+                <h1>Built with <em>WebStorm</em>, governed by <em>Junie</em> TDD.</h1>
+                <p class="hero-sub">
+                  Instead of prompting blind boilerplate, we configured JetBrains WebStorm run profiles, authored
+                  repository-level <code>.junie/guidelines.md</code> rules, and delegated our entire Fearless
+                  Pool-Squeeze &amp; Target Ban engine to an authenticated Junie CLI red-green TDD sprint.
+                </p>
+                <div class="hero-controls">
+                  <a class="btn btn-emerald" href="index.html">Launch Live Fearless Desk</a>
+                  <span class="pill pill-brass" style="background: rgba(230,196,124,0.16); color: #f6dca4; border-color: rgba(230,196,124,0.35);">
+                    Session · session-261120-022709-1mth
+                  </span>
+                </div>
+              </div>
+
+              <div class="hero-kpis">
+                <div class="kpi-tile">
+                  <div class="kpi-label">Junie Session ID</div>
+                  <div class="kpi-value" style="font-size: 16px; font-family: var(--font-mono);">session-261120-022709-1mth</div>
+                  <div class="kpi-meta">Saved in .junie/sessions/</div>
+                </div>
+                <div class="kpi-tile">
+                  <div class="kpi-label">Node Test Verification</div>
+                  <div class="kpi-value positive">17 / 17</div>
+                  <div class="kpi-meta">7 tests authored by Junie TDD</div>
+                </div>
+                <div class="kpi-tile">
+                  <div class="kpi-label">Runtime Dependencies</div>
+                  <div class="kpi-value">0</div>
+                  <div class="kpi-meta">Zero-build native ES Modules</div>
+                </div>
+                <div class="kpi-tile">
+                  <div class="kpi-label">WebStorm Run Configs</div>
+                  <div class="kpi-value">2 XML</div>
+                  <div class="kpi-meta">Dev Server + node:test Runner</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 Editorial Splash Cards: WebStorm / Junie CLI / JetBrains Air -->
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <div class="section-eyebrow">01 · Three-Pillar JetBrains Stack</div>
+              <h2 class="section-title">How each JetBrains tool shaped C9 DraftForge</h2>
+            </div>
+          </div>
+
+          <div class="story-grid">
+            <article class="splash-card">
+              <img src="assets/lol/splashes/Azir_0.jpg" alt="Azir splash" />
+              <span class="pill pill-brass" style="align-self: flex-start; margin-bottom: 10px;">JetBrains WebStorm</span>
+              <h3 style="margin: 0 0 6px; font-family: var(--font-display); font-size: 21px;">Zero-Build ESM Intelligence</h3>
+              <p style="margin: 0; font-size: 13px; color: rgba(250,247,241,0.86);">
+                JSDoc contracts across <code>src/*.js</code> gave WebStorm full type inference and jump-to-definition
+                without Webpack/Vite overhead, backed by shared <code>.idea/runConfigurations/</code> XML profiles.
+              </p>
+            </article>
+
+            <article class="splash-card">
+              <img src="assets/lol/splashes/Orianna_0.jpg" alt="Orianna splash" />
+              <span class="pill pill-emerald" style="align-self: flex-start; margin-bottom: 10px;">Junie CLI 26.11.2</span>
+              <h3 style="margin: 0 0 6px; font-family: var(--font-display); font-size: 21px;">Strict Red-Green TDD Sprint</h3>
+              <p style="margin: 0; font-size: 13px; color: rgba(250,247,241,0.86);">
+                Junie read <code>.junie/guidelines.md</code>, wrote failing tests in
+                <code>test/fearlessSqueeze.test.js</code> first, implemented <code>src/fearlessSqueeze.js</code>, and
+                verified <code>17/17</code> green tests including flex deduplication &amp; input immutability.
+              </p>
+            </article>
+
+            <article class="splash-card">
+              <img src="assets/lol/splashes/Vi_0.jpg" alt="Vi splash" />
+              <span class="pill pill-crimson" style="align-self: flex-start; margin-bottom: 10px;">JetBrains Air</span>
+              <h3 style="margin: 0 0 6px; font-family: var(--font-display); font-size: 21px;">Parallel Agent Handoff</h3>
+              <p style="margin: 0; font-size: 13px; color: rgba(250,247,241,0.86);">
+                While Junie owned the isolated algorithmic pool-squeeze sprint with deterministic specs, our editorial
+                UI &amp; Playwright E2E suite progressed in parallel — merging cleanly with zero merge conflicts.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Concrete Verifiable Session Proof -->
+      <section class="section" style="padding-top: 4px;">
+        <div class="container">
+          <div class="macro-top-grid">
+            <div class="card card-pad">
+              <div class="card-header">
+                <h3 class="card-title">Authenticated Junie CLI Session Proof</h3>
+                <span class="pill pill-emerald">Verified Artifact</span>
+              </div>
+              <p style="margin: 0 0 12px; font-size: 13px; color: var(--ink-secondary);">
+                Full JSON session log committed at
+                <code>.junie/sessions/junie-fearless-squeeze-session.json</code> with exact file diffs, model usage,
+                and test output.
+              </p>
+              <pre class="code-block">{
+  "sessionId": "session-261120-022709-1mth",
+  "taskName": "Implement Fearless Squeeze with Strict TDD and Tests",
+  "result": "Implemented the Fearless pool-squeeze and target-ban engine using a red-green test workflow.",
+  "filesCreated": [
+    "test/fearlessSqueeze.test.js (7 deterministic node:test cases)",
+    "src/fearlessSqueeze.js (84 lines pure zero-dep ESM)"
+  ],
+  "verification": "npm test: 17 passed, 0 failed"
+}</pre>
+            </div>
+
+            <div class="card card-pad">
+              <div class="card-header">
+                <h3 class="card-title">WebStorm Run Configs &amp; Guidelines</h3>
+                <span class="pill pill-obsidian">.idea/ + .junie/</span>
+              </div>
+              <p style="margin: 0 0 12px; font-size: 13px; color: var(--ink-secondary);">
+                Opening this repository in JetBrains WebStorm immediately surfaces two 1-click run targets and our
+                persistent Junie engineering rules:
+              </p>
+              <ul class="callout-list">
+                <li>
+                  <strong><code>.idea/runConfigurations/C9_DraftForge_Dev_Server.xml</code></strong> — launches our
+                  zero-build Node static ESM server at <code>http://127.0.0.1:4173</code>.
+                </li>
+                <li>
+                  <strong><code>.idea/runConfigurations/Run_Draft_and_Macro_Tests.xml</code></strong> — executes
+                  <code>npm test</code> (<code>node --test test/*.test.js</code>) inside WebStorm's native Test Runner
+                  tool window.
+                </li>
+                <li>
+                  <strong><code>.junie/guidelines.md</code></strong> — enforces pure deterministic functions, zero
+                  runtime npm dependencies, JSDoc typing, and mandatory <code>npm test</code> verification.
+                </li>
+                <li>
+                  <strong><code>.junie/tasks/fearless-squeeze-spec.md</code></strong> — exact input/output contract used
+                  to drive Junie's red-green TDD sprint with zero ambiguity.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <strong style="font-family: var(--font-display); font-size: 16px; color: #faf7f1;">C9 DraftForge</strong>
+          <span style="margin-left: 10px;">Cloud9 x JetBrains Hackathon 2026 · Category 2 &amp; Bonus Prize</span>
+        </div>
+        <div style="display: flex; gap: 18px; font-family: var(--font-mono); font-size: 12px;">
+          <a href="index.html" style="color: #ecc982;">Live Fearless Desk</a>
+          <span>Junie 26.11.2</span>
+          <span>MIT License</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

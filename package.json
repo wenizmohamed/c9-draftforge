@@ -1,0 +1,23 @@
+{
+  "name": "c9-draftforge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "C9 DraftForge — Cloud9 x JetBrains Hackathon 2026 Category 2 (LoL) Macro Scouting & Fearless Draft Management System",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "test": "node --test test/*.test.js",
+    "verify:e2e": "node scripts/verify-e2e.mjs",
+    "fetch:assets": "node scripts/fetch-lol-assets.mjs"
+  },
+  "keywords": [
+    "cloud9",
+    "jetbrains",
+    "league-of-legends",
+    "fearless-draft",
+    "grid-esports",
+    "macro-scouting",
+    "junie"
+  ],
+  "license": "MIT"
+}

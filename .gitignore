@@ -1,0 +1,8 @@
+node_modules/
+.vercel/
+video_work/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db

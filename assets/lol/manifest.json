@@ -1,0 +1,140 @@
+{
+  "patch": "16.23.1",
+  "fetchedAt": "2026-11-19T22:18:12.953Z",
+  "champions": {
+    "Azir": {
+      "file": "assets/lol/champions/Azir.png",
+      "bytes": 25934
+    },
+    "Orianna": {
+      "file": "assets/lol/champions/Orianna.png",
+      "bytes": 21902
+    },
+    "Ahri": {
+      "file": "assets/lol/champions/Ahri.png",
+      "bytes": 28511
+    },
+    "Corki": {
+      "file": "assets/lol/champions/Corki.png",
+      "bytes": 28457
+    },
+    "Taliyah": {
+      "file": "assets/lol/champions/Taliyah.png",
+      "bytes": 24435
+    },
+    "KSante": {
+      "file": "assets/lol/champions/KSante.png",
+      "bytes": 25880
+    },
+    "Rumble": {
+      "file": "assets/lol/champions/Rumble.png",
+      "bytes": 29584
+    },
+    "Renekton": {
+      "file": "assets/lol/champions/Renekton.png",
+      "bytes": 29409
+    },
+    "Jax": {
+      "file": "assets/lol/champions/Jax.png",
+      "bytes": 27107
+    },
+    "Gnar": {
+      "file": "assets/lol/champions/Gnar.png",
+      "bytes": 25845
+    },
+    "Vi": {
+      "file": "assets/lol/champions/Vi.png",
+      "bytes": 33358
+    },
+    "Sejuani": {
+      "file": "assets/lol/champions/Sejuani.png",
+      "bytes": 31761
+    },
+    "Maokai": {
+      "file": "assets/lol/champions/Maokai.png",
+      "bytes": 27854
+    },
+    "LeeSin": {
+      "file": "assets/lol/champions/LeeSin.png",
+      "bytes": 24979
+    },
+    "XinZhao": {
+      "file": "assets/lol/champions/XinZhao.png",
+      "bytes": 35410
+    },
+    "Varus": {
+      "file": "assets/lol/champions/Varus.png",
+      "bytes": 28137
+    },
+    "Kaisa": {
+      "file": "assets/lol/champions/Kaisa.png",
+      "bytes": 26828
+    },
+    "Jinx": {
+      "file": "assets/lol/champions/Jinx.png",
+      "bytes": 27938
+    },
+    "Kalista": {
+      "file": "assets/lol/champions/Kalista.png",
+      "bytes": 28603
+    },
+    "Xayah": {
+      "file": "assets/lol/champions/Xayah.png",
+      "bytes": 26882
+    },
+    "Nautilus": {
+      "file": "assets/lol/champions/Nautilus.png",
+      "bytes": 28532
+    },
+    "Rell": {
+      "file": "assets/lol/champions/Rell.png",
+      "bytes": 29915
+    },
+    "Alistar": {
+      "file": "assets/lol/champions/Alistar.png",
+      "bytes": 28116
+    },
+    "Rakan": {
+      "file": "assets/lol/champions/Rakan.png",
+      "bytes": 28472
+    },
+    "Renata": {
+      "file": "assets/lol/champions/Renata.png",
+      "bytes": 27669
+    },
+    "Leona": {
+      "file": "assets/lol/champions/Leona.png",
+      "bytes": 31573
+    },
+    "Poppy": {
+      "file": "assets/lol/champions/Poppy.png",
+      "bytes": 31447
+    },
+    "Skarner": {
+      "file": "assets/lol/champions/Skarner.png",
+      "bytes": 29500
+    }
+  },
+  "splashes": {
+    "Azir": {
+      "file": "assets/lol/splashes/Azir_0.jpg",
+      "bytes": 201062
+    },
+    "Orianna": {
+      "file": "assets/lol/splashes/Orianna_0.jpg",
+      "bytes": 154576
+    },
+    "KSante": {
+      "file": "assets/lol/splashes/KSante_0.jpg",
+      "bytes": 198492
+    },
+    "Vi": {
+      "file": "assets/lol/splashes/Vi_0.jpg",
+      "bytes": 223808
+    }
+  },
+  "map": {
+    "file": "assets/lol/map11.png",
+    "bytes": 70985
+  }
+}

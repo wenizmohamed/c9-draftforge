@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>C9 DraftForge — LoL Macro Scouting &amp; Fearless Draft War Room</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='9' fill='%2311211b'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23ecc982' font-family='Georgia,serif' font-weight='700' font-size='16'%3EDF%3C/text%3E%3C/svg%3E" />
+    <meta
+      name="description"
+      content="Cloud9 x JetBrains Hackathon 2026 Category 2 (LoL): Interactive BO3/BO5 Fearless Draft Manager, GRID LoL Macro Scouting Telemetry, Summoner's Rift Jungle Proximity Overlay, and Junie Pool-Squeeze Engine."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="index.html">
+          <div class="brand-mark">DF</div>
+          <div class="brand-text">
+            <span class="brand-name">C9 DraftForge</span>
+            <span class="brand-sub">Category 2 · LoL Fearless &amp; Macro Desk</span>
+          </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-link active" href="#fearless-desk">Fearless Draft</a>
+          <a class="nav-link" href="#macro-scouting">Macro Scouting</a>
+          <a class="nav-link" href="#pool-fatigue">Pool Fatigue</a>
+          <a class="nav-link" href="workflow.html">JetBrains + Junie Story</a>
+        </nav>
+
+        <div class="topbar-actions">
+          <button id="btn-export-md" class="btn btn-sm btn-brass" type="button">Export Dossier (.md)</button>
+          <button id="btn-export-json" class="btn btn-sm btn-primary btn-hide-sm" type="button">Export JSON</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Editorial War-Room Masthead -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-frame">
+            <div class="hero-backdrop" aria-hidden="true">
+              <img src="assets/lol/splashes/Azir_0.jpg" alt="" />
+              <img src="assets/lol/splashes/KSante_0.jpg" alt="" />
+            </div>
+            <div class="hero-scrim" aria-hidden="true"></div>
+            <div class="hero-content">
+              <div>
+                <div class="hero-kicker">
+                  <span class="hero-kicker-dot"></span>
+                  <span>Cloud9 x JetBrains · Riot Patch 16.23.1 · GRID LoL Series State</span>
+                </div>
+                <h1>Command every <em>Fearless</em> pick before first wave meets.</h1>
+                <p class="hero-sub">
+                  Built for Cloud9 League of Legends coaching staff: enforce official BO3/BO5 Fearless cross-game
+                  lockouts, parse live GRID LoL telemetry onto a calibrated Summoner's Rift command map, and squeeze
+                  opponent champion pools with deterministic Junie analytics.
+                </p>
+                <div class="hero-controls">
+                  <select id="preset-select" class="preset-select" aria-label="Select Pro Scouting Series Preset">
+                    <option value="c9-tl-lcs-finals">C9 vs Team Liquid — LCS Finals BO5</option>
+                    <option value="c9-fly-fearless">C9 vs FlyQuest — Fearless BO3</option>
+                    <option value="c9-g2-msi-scrim">C9 vs G2 Esports — MSI Scrim Block</option>
+                  </select>
+                  <button id="btn-hero-autofill" class="btn btn-emerald" type="button">Simulate Game Draft</button>
+                  <a class="btn btn-ghost" style="color: #faf7f1; border-color: rgba(250,247,241,0.3);" href="workflow.html">
+                    WebStorm + Junie Workflow &rarr;
+                  </a>
+                </div>
+              </div>
+
+              <div class="hero-kpis" id="hero-kpis">
+                <div class="kpi-tile">
+                  <div class="kpi-label">Avg Gold@15 Delta</div>
+                  <div class="kpi-value positive" id="kpi-gold15">+1,047g</div>
+                  <div class="kpi-meta" id="kpi-gold15-meta">C9 lead across 3 scouted games</div>
+                </div>
+                <div class="kpi-tile">
+                  <div class="kpi-label">Voidgrubs Control</div>
+                  <div class="kpi-value" id="kpi-grubs">72%</div>
+                  <div class="kpi-meta" id="kpi-grubs-meta">13 / 18 Voidgrubs secured</div>
+                </div>
+                <div class="kpi-tile">
+                  <div class="kpi-label">Fearless Locked Pool</div>
+                  <div class="kpi-value" id="kpi-locked">0</div>
+                  <div class="kpi-meta" id="kpi-locked-meta">Game 1 open · 28 meta picks live</div>
+                </div>
+                <div class="kpi-tile">
+                  <div class="kpi-label">Top Squeeze Target</div>
+                  <div class="kpi-value" id="kpi-squeeze-target">APA · MID</div>
+                  <div class="kpi-meta" id="kpi-squeeze-meta">Junie Pool-Squeeze Engine live</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 1: Fearless Draft BO3 / BO5 Desk -->
+      <section class="section" id="fearless-desk">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <div class="section-eyebrow">01 · Official 2025/2026 Fearless Draft Engine</div>
+              <h2 class="section-title">BO3 / BO5 Interactive Draft Desk</h2>
+              <p class="section-desc">
+                Every champion picked by either team in prior games is hard-locked and stamped across remaining games.
+              </p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <button id="btn-undo" class="btn btn-sm" type="button">Undo Step</button>
+              <button id="btn-autofill" class="btn btn-sm btn-brass" type="button">Auto-Fill Game</button>
+              <button id="btn-next-game" class="btn btn-sm btn-emerald" type="button">Advance to Next Game &rarr;</button>
+              <button id="btn-reset" class="btn btn-sm btn-ghost" type="button">Reset Series</button>
+            </div>
+          </div>
+
+          <div class="series-bar">
+            <div class="stepper-group">
+              <div class="format-toggle" role="group" aria-label="Series Format">
+                <button id="fmt-bo5" class="format-btn active" type="button">BO5</button>
+                <button id="fmt-bo3" class="format-btn" type="button">BO3</button>
+              </div>
+              <div id="game-stepper" class="stepper-group"></div>
+            </div>
+            <div class="stepper-group">
+              <span class="pill pill-crimson" id="lockout-counter-pill">0 Fearless Lockouts Active</span>
+              <span class="pill pill-obsidian" id="series-matchup-pill">Cloud9 vs Team Liquid</span>
+            </div>
+          </div>
+
+          <div class="draft-phase-banner">
+            <div class="phase-turn">
+              <span id="phase-badge" class="phase-badge blue">BLUE BAN</span>
+              <span id="phase-label">Game 1 · Step 1/20 · Blue Ban 1 (Cloud9)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12px;">
+              <span id="phase-hint">Click any open champion portrait or coach recommendation below</span>
+            </div>
+          </div>
+
+          <div class="draft-grid">
+            <!-- Blue Side Column (Cloud9) -->
+            <div class="team-col" id="blue-col">
+              <div class="team-col-head blue">
+                <span class="team-name" id="blue-team-name">Cloud9</span>
+                <span class="side-tag blue">Blue Side</span>
+              </div>
+              <div class="ban-row" id="blue-bans" aria-label="Blue Side Bans"></div>
+              <div class="pick-list" id="blue-picks" aria-label="Blue Side Picks"></div>
+              <div class="comp-box" id="blue-comp"></div>
+            </div>
+
+            <!-- Center Champion Pool -->
+            <div class="card pool-card">
+              <div class="pool-toolbar">
+                <div class="role-tabs" id="role-tabs" role="tablist" aria-label="Filter Champions by Role">
+                  <button class="role-tab active" data-role="ALL" type="button">ALL (28)</button>
+                  <button class="role-tab" data-role="TOP" type="button">TOP</button>
+                  <button class="role-tab" data-role="JGL" type="button">JGL</button>
+                  <button class="role-tab" data-role="MID" type="button">MID</button>
+                  <button class="role-tab" data-role="BOT" type="button">BOT</button>
+                  <button class="role-tab" data-role="SUP" type="button">SUP</button>
+                </div>
+                <input
+                  id="champ-search"
+                  class="search-input"
+                  type="search"
+                  placeholder="Filter champion..."
+                  aria-label="Filter champion by name"
+                />
+              </div>
+              <div class="champ-grid" id="champ-grid"></div>
+            </div>
+
+            <!-- Red Side Column (Opponent) -->
+            <div class="team-col" id="red-col">
+              <div class="team-col-head red">
+                <span class="team-name" id="red-team-name">Team Liquid</span>
+                <span class="side-tag red">Red Side</span>
+              </div>
+              <div class="ban-row" id="red-bans" aria-label="Red Side Bans"></div>
+              <div class="pick-list" id="red-picks" aria-label="Red Side Picks"></div>
+              <div class="comp-box" id="red-comp"></div>
+            </div>
+          </div>
+
+          <!-- Dual Recommendation Intelligence Strip -->
+          <div class="rec-grid">
+            <div class="card card-pad">
+              <div class="card-header">
+                <h3 class="card-title">Real-Time Counter-Pick &amp; Synergy Coach</h3>
+                <span class="pill pill-emerald" id="rec-context-pill">Active Turn · Click to Draft</span>
+              </div>
+              <div class="rec-list" id="rec-list"></div>
+            </div>
+
+            <div class="card card-pad">
+              <div class="card-header">
+                <h3 class="card-title">Fearless Pool-Squeeze Target Bans</h3>
+                <span class="pill pill-crimson">Powered by Junie TDD Module</span>
+              </div>
+              <p id="squeeze-directive" style="margin: 0 0 10px; font-size: 12.5px; color: var(--ink-secondary);"></p>
+              <div class="rec-list" id="squeeze-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: GRID LoL Macro Scouting & Calibrated Summoner's Rift -->
+      <section class="section" id="macro-scouting" style="padding-top: 8px;">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <div class="section-eyebrow">02 · GRID LoL Series State Telemetry</div>
+              <h2 class="section-title">Macro Scouting &amp; Summoner's Rift Command Map</h2>
+              <p class="section-desc">
+                Deterministic early-game Gold@15 deltas, neutral objective control, and opponent jungle pathing
+                projected onto Riot's official 14,870 &times; 14,870 Summoner's Rift minimap.
+              </p>
+            </div>
+            <span class="pill pill-obsidian" id="grid-series-id-pill">GRID ID · grid-lol-2894102</span>
+          </div>
+
+          <div class="macro-top-grid">
+            <!-- Calibrated Summoner's Rift Minimap Card -->
+            <div class="card card-pad">
+              <div class="card-header">
+                <h3 class="card-title">Jungle Proximity &amp; First-Gank Lane Overlay</h3>
+                <span class="pill pill-brass" id="gank-bias-pill">Primary Bias: BOT</span>
+              </div>
+
+              <div class="rift-wrapper" id="rift-map-container">
+                <img
+                  class="rift-map-img"
+                  src="assets/lol/map11.png"
+                  alt="Official Riot Summoner's Rift minimap calibrated for GRID coordinate telemetry"
+                />
+                <div class="rift-overlay" id="rift-overlay"></div>
+              </div>
+
+              <div class="rift-legend">
+                <span><span class="legend-dot" style="background: #c43e37;"></span>Opponent Gank / Proximity</span>
+                <span><span class="legend-dot" style="background: #1c8357;"></span>Cloud9 Response / Setup</span>
+                <span id="gank-split-readout">TOP 0% · MID 33% · BOT 67%</span>
+              </div>
+            </div>
+
+            <!-- Right Telemetry Column: Gold@15 + Objective Control + Callouts + Custom GRID Dropzone -->
+            <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+              <div class="card card-pad">
+                <div class="card-header">
+                  <h3 class="card-title">Gold@15 Delta by Game</h3>
+                  <span class="pill pill-emerald" id="gold-avg-pill">Avg +1,047g</span>
+                </div>
+                <div class="gold-chart" id="gold-chart"></div>
+              </div>
+
+              <div class="card card-pad">
+                <div class="card-header">
+                  <h3 class="card-title">Neutral &amp; Map Objective Control</h3>
+                  <span class="pill" id="obj-sample-pill">3 Games Parsed</span>
+                </div>
+                <div class="obj-list" id="objective-bars"></div>
+              </div>
+
+              <div class="card card-pad">
+                <div class="card-header">
+                  <h3 class="card-title">Coaching Desk Callouts</h3>
+                  <span class="pill pill-brass">Actionable Prep</span>
+                </div>
+                <ul class="callout-list" id="macro-callouts"></ul>
+
+                <div class="dropzone" id="grid-dropzone">
+                  <div>
+                    <strong style="font-size: 13px; display: block;">Import Custom GRID LoL Series State JSON</strong>
+                    <span style="font-size: 11.5px; color: var(--ink-muted);">
+                      Drag &amp; drop any <code>data.seriesState.games[]</code> payload or load from disk.
+                    </span>
+                  </div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="file" id="grid-file-input" accept=".json,application/json" hidden />
+                    <button id="btn-upload-grid" class="btn btn-sm btn-primary" type="button">Load GRID JSON</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opponent Player Champion Pool Depth & Fearless Fatigue -->
+          <div id="pool-fatigue" style="margin-top: 26px;">
+            <div class="section-header" style="margin-bottom: 12px;">
+              <div>
+                <div class="section-eyebrow">03 · Opponent Roster &amp; Series Stamina</div>
+                <h3 class="section-title" style="font-size: 1.45rem;">Champion Pool Depth &amp; Fearless Squeeze Pressure</h3>
+              </div>
+              <span class="pill pill-crimson" id="highest-pressure-pill">Highest Squeeze: MID</span>
+            </div>
+            <div class="pool-fatigue-grid" id="pool-fatigue-grid"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <strong style="font-family: var(--font-display); font-size: 16px; color: #faf7f1;">C9 DraftForge</strong>
+          <span style="margin-left: 10px;">Cloud9 x JetBrains Hackathon 2026 · Category 2 (League of Legends)</span>
+        </div>
+        <div style="display: flex; gap: 18px; font-family: var(--font-mono); font-size: 12px;">
+          <a href="workflow.html" style="color: #ecc982;">JetBrains + Junie Proof</a>
+          <span>Riot Data Dragon Patch 16.23.1</span>
+          <span>MIT License</span>
+        </div>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

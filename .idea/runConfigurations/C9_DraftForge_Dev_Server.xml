@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="C9 DraftForge Dev Server" type="NodeJSConfigurationType" path-to-js-file="$PROJECT_DIR$/scripts/dev-server.mjs" working-dir="$PROJECT_DIR$">
+    <envs>
+      <env name="PORT" value="4173" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>
