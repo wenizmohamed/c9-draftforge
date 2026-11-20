@@ -30,6 +30,7 @@
 
         <nav class="nav-links" aria-label="Primary">
           <a class="nav-link" href="index.html#fearless-desk">Fearless Draft</a>
+          <a class="nav-link" href="index.html#series-simulator">Series Matrix</a>
           <a class="nav-link" href="index.html#macro-scouting">Macro Scouting</a>
           <a class="nav-link" href="index.html#pool-fatigue">Pool Fatigue</a>
           <a class="nav-link active" href="workflow.html">JetBrains + Junie Story</a>
@@ -78,8 +79,8 @@
                 </div>
                 <div class="kpi-tile">
                   <div class="kpi-label">Node Test Verification</div>
-                  <div class="kpi-value positive">17 / 17</div>
-                  <div class="kpi-meta">7 tests authored by Junie TDD</div>
+                  <div class="kpi-value positive">31 / 31</div>
+                  <div class="kpi-meta">7 Junie TDD + 14 Series Sim tests</div>
                 </div>
                 <div class="kpi-tile">
                   <div class="kpi-label">Runtime Dependencies</div>
@@ -125,7 +126,7 @@
               <p style="margin: 0; font-size: 13px; color: rgba(250,247,241,0.86);">
                 Junie read <code>.junie/guidelines.md</code>, wrote failing tests in
                 <code>test/fearlessSqueeze.test.js</code> first, implemented <code>src/fearlessSqueeze.js</code>, and
-                verified <code>17/17</code> green tests including flex deduplication &amp; input immutability.
+                verified green tests before our Series Simulator expansion brought the suite to <code>31/31</code> PASS.
               </p>
             </article>
 
@@ -135,9 +136,46 @@
               <h3 style="margin: 0 0 6px; font-family: var(--font-display); font-size: 21px;">Parallel Agent Handoff</h3>
               <p style="margin: 0; font-size: 13px; color: rgba(250,247,241,0.86);">
                 While Junie owned the isolated algorithmic pool-squeeze sprint with deterministic specs, our editorial
-                UI &amp; Playwright E2E suite progressed in parallel — merging cleanly with zero merge conflicts.
+                UI, Game 1&rarr;5 Collapse Matrix, and Playwright E2E suite progressed in parallel — merging cleanly with zero conflicts.
               </p>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Workspace Screenshot: WebStorm 2026.3 + JetBrains Air + Junie -->
+      <section class="section" style="padding-top: 4px;" aria-label="Live WebStorm JetBrains Air and Junie Evidence">
+        <div class="container">
+          <div class="card card-pad">
+            <div class="card-header" style="flex-wrap: wrap;">
+              <div>
+                <div class="section-eyebrow">02 · Live IDE &amp; Agent Orchestration Proof</div>
+                <h2 class="card-title" style="font-family: var(--font-display); font-size: 1.55rem; margin-top: 3px;">
+                  Live Workspace: WebStorm 2026.3 + JetBrains Air + Junie
+                </h2>
+                <p style="margin: 4px 0 0; font-size: 13px; color: var(--ink-secondary);">
+                  Captured directly inside JetBrains WebStorm 2026.3 with JetBrains Air ACP orchestrating Junie alongside
+                  our committed <code>.idea/runConfigurations/</code> XML profiles, <code>.junie/guidelines.md</code>,
+                  and <code>.junie/sessions/junie-fearless-squeeze-session.json</code>.
+                </p>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                <span class="pill pill-obsidian">WebStorm 2026.3</span>
+                <span class="pill pill-emerald">31 / 31 node:test PASS</span>
+                <span class="pill pill-brass">session-261120-022709-1mth</span>
+              </div>
+            </div>
+
+            <div class="workspace-proof-frame">
+              <img
+                src="assets/jetbrains-air-junie-workspace.png"
+                alt="JetBrains WebStorm 2026.3 running JetBrains Air and Junie AI Coding Agent with .idea run configurations and .junie session artifacts"
+              />
+              <div class="workspace-proof-bar">
+                <span>IDE: WebStorm 2026.3 &middot; Agent: Junie CLI 26.11.2 &middot; Orchestrator: JetBrains Air ACP</span>
+                <span style="color: #ecc982;">Verified: npm test (31/31) &middot; Playwright E2E (1440px + 390px)</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -164,7 +202,8 @@
     "test/fearlessSqueeze.test.js (7 deterministic node:test cases)",
     "src/fearlessSqueeze.js (84 lines pure zero-dep ESM)"
   ],
-  "verification": "npm test: 17 passed, 0 failed"
+  "junieSprintVerification": "npm test: 17 passed, 0 failed",
+  "currentSuiteVerification": "npm test: 31 passed, 0 failed (5 suites incl. test/seriesSimulator.test.js)"
 }</pre>
             </div>
 

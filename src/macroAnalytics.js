@@ -119,61 +119,65 @@ export function analyzeMacroSeries(parsedSeries) {
     BOT: Math.round((proxCounts.BOT / proxTotal) * 100)
   };
 
-  // 4. Opponent Player Champion Pool Depth & Fearless Fatigue
-  const playerMap = new Map();
-  for (const g of games) {
-    for (const p of g.opponentPlayers) {
-      const key = `${p.role}:${p.name}`;
-      if (!playerMap.has(key)) {
-        playerMap.set(key, {
-          name: p.name,
-          role: p.role,
-          championsPlayed: [],
-          champCounts: new Map(),
-          kills: 0,
-          deaths: 0,
-          assists: 0,
-          cs15Total: 0,
-          games: 0
-        });
+  // 4. Player Champion Pool Depth & Fearless Fatigue (Opponent + Focus Team)
+  const buildPoolProfiles = (selector) => {
+    const playerMap = new Map();
+    for (const g of games) {
+      for (const p of selector(g) || []) {
+        const key = `${p.role}:${p.name}`;
+        if (!playerMap.has(key)) {
+          playerMap.set(key, {
+            name: p.name,
+            role: p.role,
+            championsPlayed: [],
+            champCounts: new Map(),
+            kills: 0,
+            deaths: 0,
+            assists: 0,
+            cs15Total: 0,
+            games: 0
+          });
+        }
+        const entry = playerMap.get(key);
+        entry.championsPlayed.push(p.championId);
+        entry.champCounts.set(p.championId, (entry.champCounts.get(p.championId) || 0) + 1);
+        entry.kills += Number(p.kills || 0);
+        entry.deaths += Number(p.deaths || 0);
+        entry.assists += Number(p.assists || 0);
+        entry.cs15Total += Number(p.csAt15 || 0);
+        entry.games += 1;
       }
-      const entry = playerMap.get(key);
-      entry.championsPlayed.push(p.championId);
-      entry.champCounts.set(p.championId, (entry.champCounts.get(p.championId) || 0) + 1);
-      entry.kills += Number(p.kills || 0);
-      entry.deaths += Number(p.deaths || 0);
-      entry.assists += Number(p.assists || 0);
-      entry.cs15Total += Number(p.csAt15 || 0);
-      entry.games += 1;
     }
-  }
 
-  const opponentPoolProfiles = [...playerMap.values()].map((p) => {
-    const uniqueChamps = [...p.champCounts.keys()];
-    const repeatCount = p.games - uniqueChamps.length;
-    // Lower unique-to-games ratio + role choke points = higher Fearless fatigue risk
-    const diversityRatio = uniqueChamps.length / Math.max(1, p.games);
-    const kda = Number(((p.kills + p.assists) / Math.max(1, p.deaths)).toFixed(2));
-    const avgCs15 = Math.round(p.cs15Total / Math.max(1, p.games));
-    const fearlessFatigueScore = Math.min(
-      96,
-      Math.max(24, Math.round(54 + repeatCount * 22 + (1 - diversityRatio) * 28 + (p.role === 'MID' || p.role === 'JGL' ? 6 : 0)))
-    );
-    const riskLevel =
-      fearlessFatigueScore >= 75 ? 'HIGH' : fearlessFatigueScore >= 55 ? 'MEDIUM' : 'LOW';
+    return [...playerMap.values()].map((p) => {
+      const uniqueChamps = [...p.champCounts.keys()];
+      const repeatCount = p.games - uniqueChamps.length;
+      const diversityRatio = uniqueChamps.length / Math.max(1, p.games);
+      const kda = Number(((p.kills + p.assists) / Math.max(1, p.deaths)).toFixed(2));
+      const avgCs15 = Math.round(p.cs15Total / Math.max(1, p.games));
+      const fearlessFatigueScore = Math.min(
+        96,
+        Math.max(24, Math.round(54 + repeatCount * 22 + (1 - diversityRatio) * 28 + (p.role === 'MID' || p.role === 'JGL' ? 6 : 0)))
+      );
+      const riskLevel =
+        fearlessFatigueScore >= 75 ? 'HIGH' : fearlessFatigueScore >= 55 ? 'MEDIUM' : 'LOW';
 
-    return {
-      name: p.name,
-      role: p.role,
-      games: p.games,
-      uniqueChampions: uniqueChamps,
-      uniqueCount: uniqueChamps.length,
-      kda,
-      avgCs15,
-      fearlessFatigueScore,
-      riskLevel
-    };
-  });
+      return {
+        name: p.name,
+        role: p.role,
+        games: p.games,
+        uniqueChampions: uniqueChamps,
+        uniqueCount: uniqueChamps.length,
+        kda,
+        avgCs15,
+        fearlessFatigueScore,
+        riskLevel
+      };
+    });
+  };
+
+  const opponentPoolProfiles = buildPoolProfiles((g) => g.opponentPlayers);
+  const focusPoolProfiles = buildPoolProfiles((g) => g.focusPlayers);
 
   const opponentSignatureIds = [
     ...new Set(opponentPoolProfiles.flatMap((p) => p.uniqueChampions))
@@ -215,6 +219,7 @@ export function analyzeMacroSeries(parsedSeries) {
     firstGankDistribution,
     jungleProximity,
     mapEvents: allEvents,
+    focusPoolProfiles,
     opponentPoolProfiles,
     opponentSignatureIds,
     callouts
@@ -224,7 +229,7 @@ export function analyzeMacroSeries(parsedSeries) {
 /**
  * Generate a 1-click Coach Draft & Macro Dossier in Markdown format.
  */
-export function generateDossierMarkdown({ series, macroReport, squeezeReport = null }) {
+export function generateDossierMarkdown({ series, macroReport, squeezeReport = null, simulationReport = null }) {
   const activeGame = series.games[series.currentGameIndex];
   const lines = [
     `# C9 DraftForge — Coach Draft & Macro Dossier`,
@@ -271,21 +276,50 @@ export function generateDossierMarkdown({ series, macroReport, squeezeReport = n
     );
   }
 
+  if (simulationReport && simulationReport.comparison && simulationReport.matrix) {
+    const { standard, fearless, delta } = simulationReport.comparison;
+    const fc = simulationReport.matrix.summary?.firstCollapse;
+    const fmtSign = (n, suffix = '') => `${n >= 0 ? '+' : ''}${n}${suffix}`;
+    lines.push(
+      ``,
+      `## 6. Side-by-Side Series Delta & Game 1->${series.maxGames} Pool Collapse Simulator`,
+      `- **Coaching Levers:** Target Pinch \`${simulationReport.options.effectivePinchRole}\` · Ban-Wave \`${simulationReport.options.banWaveIntensity}\` · Voidgrub Priority \`${simulationReport.options.voidgrubPriority ? 'ON' : 'OFF'}\``,
+      ``,
+      `| Metric | Unconstrained Standard | Fearless Pool-Squeeze | Net Delta |`,
+      `|---|---:|---:|---:|`,
+      `| Projected ${series.blueTeam} Series Win% | ${standard.seriesWinProbPct}% | ${fearless.seriesWinProbPct}% | ${fmtSign(delta.seriesWinProbPct, '%')} |`,
+      `| Late-Series Draft Edge (${simulationReport.comparison.lateSeriesLabel}) | ${fmtSign(standard.lateSeriesAdvantagePct, '%')} | ${fmtSign(fearless.lateSeriesAdvantagePct, '%')} | ${fmtSign(delta.lateSeriesAdvantagePct, '%')} |`,
+      `| Projected Gold@15 Delta | ${fmtSign(standard.projectedGoldAt15, 'g')} | ${fmtSign(fearless.projectedGoldAt15, 'g')} | ${fmtSign(delta.projectedGoldAt15, 'g')} |`,
+      `| Voidgrubs Synergy Share | ${standard.voidgrubsSynergyPct}% | ${fearless.voidgrubsSynergyPct}% | ${fmtSign(delta.voidgrubsSynergyPct, '%')} |`,
+      `| Opponent Comfort-Pool Attrition | ${standard.oppComfortAttritionPct}% | ${fearless.oppComfortAttritionPct}% | ${fmtSign(delta.oppComfortAttritionPct, '%')} |`
+    );
+    if (fc) {
+      lines.push(
+        ``,
+        `- **First Role Collapse:** **${fc.role} (${fc.playerName})** reaches \`${fc.collapseLabel}\` in **Game ${fc.gameNumber}** — ${fc.reason}`
+      );
+    }
+    if (Array.isArray(simulationReport.winConditionBrief) && simulationReport.winConditionBrief.length > 0) {
+      lines.push(``, `### Win-Condition Directives`, ...simulationReport.winConditionBrief.map((b) => `- ${b}`));
+    }
+  }
+
   return lines.join('\n') + '\n';
 }
 
 /**
  * Generate a machine-readable JSON dossier bundle for coaching staff & JetBrains pipelines.
  */
-export function generateDossierJson({ series, macroReport, squeezeReport = null }) {
+export function generateDossierJson({ series, macroReport, squeezeReport = null, simulationReport = null }) {
   return JSON.stringify(
     {
       tool: 'C9 DraftForge',
-      version: '1.0.0',
+      version: '1.1.0',
       exportedAt: new Date().toISOString(),
       series,
       macroReport,
-      squeezeReport
+      squeezeReport,
+      simulationReport
     },
     null,
     2

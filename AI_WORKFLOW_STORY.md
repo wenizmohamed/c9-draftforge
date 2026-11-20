@@ -26,17 +26,18 @@ To ship a zero-build, zero-dependency, 100% deterministic application fast enoug
      - Wrote failing tests first in `test/fearlessSqueeze.test.js` (confirmed red state).
      - Implemented `src/fearlessSqueeze.js` (84 lines of pure, immutable ESM computing `rolePressures`, ranked `targetBans`, and `summary.coachDirective`).
      - Added 7 edge-case unit tests covering Game 1 baselines, cross-game Fearless escalation (`G1 -> G2`), distinguishing previous-game picks (locked) from previous-game bans (re-open), `BO3`/`BO5` remaining-game math, empty/missing scouting profiles, fully exhausted comfort pools, flex-pick deduplication, and strict input immutability.
-     - Verified `npm test` -> **17 passed, 0 failed**.
+     - Verified `npm test` -> **17 passed, 0 failed** at sprint completion, later expanded with 14 deterministic Series Delta & Game 1->5 Pool Collapse Matrix tests (`test/seriesSimulator.test.js`) to **31 passed, 0 failed**.
 
 3. **JetBrains Air — Parallel Specification-Driven Workflow**
-   - Because the contract between `src/fearlessSqueeze.js`, `src/macroAnalytics.js`, and `app.js` was locked upfront in `.junie/tasks/fearless-squeeze-spec.md`, Junie executed its TDD sprint autonomously while the editorial war-room UI (`index.html`, `styles.css`, `app.js`), official Riot Data Dragon asset vendoring (`scripts/fetch-lol-assets.mjs`), and Playwright E2E harness (`scripts/verify-e2e.mjs`) were built in parallel — integrating on the first try with zero runtime or console errors.
+   - Because the contract between `src/fearlessSqueeze.js`, `src/seriesSimulator.js`, `src/macroAnalytics.js`, and `app.js` was locked upfront in `.junie/tasks/fearless-squeeze-spec.md`, Junie executed its TDD sprint autonomously while the editorial war-room UI (`index.html`, `styles.css`, `app.js`), official Riot Data Dragon asset vendoring (`scripts/fetch-lol-assets.mjs`), and Playwright E2E harness (`scripts/verify-e2e.mjs`) were built in parallel — integrating on the first try with zero runtime or console errors.
+   - Live workspace capture from WebStorm 2026.3 + JetBrains Air + Junie is committed at [`assets/jetbrains-air-junie-workspace.png`](assets/jetbrains-air-junie-workspace.png) and displayed on [`workflow.html`](workflow.html).
 
 ---
 
 ## 2. Reproducing Our Verification Locally
 
 ```bash
-# 1. Run all 17 unit tests (including Junie's 7 Fearless Squeeze TDD tests)
+# 1. Run all 31 deterministic unit tests (including Junie's 7 Fearless Squeeze TDD tests + 14 Series Simulator tests)
 npm test
 
 # 2. Launch local dev server (or click "C9 DraftForge Dev Server" in WebStorm)

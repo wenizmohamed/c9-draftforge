@@ -30,6 +30,7 @@
 
         <nav class="nav-links" aria-label="Primary">
           <a class="nav-link active" href="#fearless-desk">Fearless Draft</a>
+          <a class="nav-link" href="#series-simulator">Series Matrix</a>
           <a class="nav-link" href="#macro-scouting">Macro Scouting</a>
           <a class="nav-link" href="#pool-fatigue">Pool Fatigue</a>
           <a class="nav-link" href="workflow.html">JetBrains + Junie Story</a>
@@ -215,12 +216,126 @@
         </div>
       </section>
 
-      <!-- SECTION 2: GRID LoL Macro Scouting & Calibrated Summoner's Rift -->
+      <!-- SECTION 2: Side-by-Side Series Delta Simulator & Game 1->5 Fearless Pool Collapse Matrix -->
+      <section class="section" id="series-simulator" style="padding-top: 8px;">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <div class="section-eyebrow">02 · Fearless Series Strategy &amp; Collapse Analytics</div>
+              <h2 class="section-title">Series Delta Simulator &amp; Game 1&rarr;5 Pool Collapse Matrix</h2>
+              <p class="section-desc">
+                Compare Unconstrained Standard Draft against an active Fearless Pool-Squeeze plan, and inspect which
+                opponent role collapses first as cross-game lockouts stack across a BO3 or BO5.
+              </p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+              <span class="pill pill-crimson" id="first-collapse-pill">1st Collapse: MID · G2</span>
+              <span class="pill pill-emerald" id="series-delta-pill">Series Win &Delta;: +10.2%</span>
+            </div>
+          </div>
+
+          <!-- Interactive Coaching Levers & Scenario Presets -->
+          <div class="sim-controls-bar" aria-label="Coaching Simulation Levers">
+            <div class="sim-lever-group">
+              <span class="sim-lever-label">Target Pinch Role</span>
+              <div class="sim-segmented" id="sim-pinch-group" role="group" aria-label="Target Pinch Role">
+                <button class="sim-seg-btn active" data-pinch-role="AUTO" type="button">AUTO</button>
+                <button class="sim-seg-btn" data-pinch-role="TOP" type="button">TOP</button>
+                <button class="sim-seg-btn" data-pinch-role="JGL" type="button">JGL</button>
+                <button class="sim-seg-btn" data-pinch-role="MID" type="button">MID</button>
+                <button class="sim-seg-btn" data-pinch-role="BOT" type="button">BOT</button>
+                <button class="sim-seg-btn" data-pinch-role="SUP" type="button">SUP</button>
+              </div>
+            </div>
+
+            <div class="sim-lever-group">
+              <span class="sim-lever-label">Ban-Wave Intensity</span>
+              <div class="sim-segmented" id="sim-intensity-group" role="group" aria-label="Ban-Wave Intensity">
+                <button class="sim-seg-btn" data-intensity="STANDARD" type="button">Standard</button>
+                <button class="sim-seg-btn active" data-intensity="AGGRESSIVE" type="button">Aggressive</button>
+                <button class="sim-seg-btn" data-intensity="ALL_IN" type="button">All-In</button>
+              </div>
+            </div>
+
+            <div class="sim-lever-group">
+              <span class="sim-lever-label">6:00 Voidgrub Tempo</span>
+              <button id="sim-voidgrub-toggle" class="sim-toggle-btn active" type="button" aria-pressed="true">
+                <span class="sim-toggle-dot"></span>
+                <span id="sim-voidgrub-label">Priority ON</span>
+              </button>
+            </div>
+
+            <div class="sim-scenarios" id="sim-scenario-chips" aria-label="Coaching Scenario Presets"></div>
+          </div>
+
+          <!-- Panel A: Side-by-Side Series Delta & Win-Condition Simulator -->
+          <div class="card card-pad" style="margin-bottom: 18px;">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Side-by-Side Series Delta &amp; Win-Condition Simulator</h3>
+                <p style="margin: 2px 0 0; font-size: 12px; color: var(--ink-muted);" id="sim-subtitle">
+                  Deterministic BO5 equity projection combining GRID macro baselines, Voidgrub tempo, and Fearless pool attrition.
+                </p>
+              </div>
+              <span class="pill pill-obsidian" id="sim-lever-summary-pill">Pinch: MID · Aggressive · Grubs ON</span>
+            </div>
+
+            <div class="delta-compare-grid">
+              <div class="plan-card baseline" id="sim-standard-card"></div>
+              <div class="plan-card fearless" id="sim-fearless-card"></div>
+            </div>
+
+            <div class="sim-bottom-strip">
+              <div class="curve-card">
+                <div class="curve-head">
+                  <span>Game-by-Game Win Equity Trajectory (Standard vs Fearless)</span>
+                  <span class="pill pill-emerald" id="sim-curve-edge-pill">Late-Series Surge</span>
+                </div>
+                <div class="curve-bars" id="sim-win-curve"></div>
+              </div>
+
+              <div class="brief-card">
+                <div class="curve-head">
+                  <span>Win-Condition Coaching Brief</span>
+                  <span class="pill pill-brass">Synced to Dossier Export</span>
+                </div>
+                <ul class="callout-list" id="sim-win-brief"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel B: Interactive Game 1->5 Fearless Pool Collapse Matrix -->
+          <div class="card card-pad">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Game 1&rarr;5 Fearless Pool Collapse Matrix</h3>
+                <p style="margin: 2px 0 0; font-size: 12px; color: var(--ink-muted);">
+                  Click any role &times; game cell to inspect exact locked-out champions, remaining comfort picks, and Cloud9 vs Opponent pool depth.
+                </p>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+                <span class="pill pill-emerald">OPEN</span>
+                <span class="pill pill-brass">SQUEEZED</span>
+                <span class="pill pill-crimson">CRITICAL SQUEEZE</span>
+              </div>
+            </div>
+
+            <div class="matrix-scroll">
+              <table class="collapse-matrix" id="collapse-matrix-table" aria-label="Fearless Pool Collapse Matrix"></table>
+            </div>
+
+            <!-- Interactive Cell Inspector Drawer -->
+            <div class="matrix-inspector" id="matrix-inspector" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: GRID LoL Macro Scouting & Calibrated Summoner's Rift -->
       <section class="section" id="macro-scouting" style="padding-top: 8px;">
         <div class="container">
           <div class="section-header">
             <div>
-              <div class="section-eyebrow">02 · GRID LoL Series State Telemetry</div>
+              <div class="section-eyebrow">03 · GRID LoL Series State Telemetry</div>
               <h2 class="section-title">Macro Scouting &amp; Summoner's Rift Command Map</h2>
               <p class="section-desc">
                 Deterministic early-game Gold@15 deltas, neutral objective control, and opponent jungle pathing
@@ -299,7 +414,7 @@
           <div id="pool-fatigue" style="margin-top: 26px;">
             <div class="section-header" style="margin-bottom: 12px;">
               <div>
-                <div class="section-eyebrow">03 · Opponent Roster &amp; Series Stamina</div>
+                <div class="section-eyebrow">04 · Opponent Roster &amp; Series Stamina</div>
                 <h3 class="section-title" style="font-size: 1.45rem;">Champion Pool Depth &amp; Fearless Squeeze Pressure</h3>
               </div>
               <span class="pill pill-crimson" id="highest-pressure-pill">Highest Squeeze: MID</span>

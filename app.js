@@ -20,6 +20,7 @@ import {
   generateDossierJson
 } from './src/macroAnalytics.js';
 import { analyzeFearlessSqueeze } from './src/fearlessSqueeze.js';
+import { simulateSeriesDelta, SIMULATOR_SCENARIOS } from './src/seriesSimulator.js';
 
 const ROLE_LABELS = ['TOP', 'JGL', 'MID', 'BOT', 'SUP'];
 
@@ -29,6 +30,14 @@ const state = {
   macroReport: null,
   series: null,
   squeezeReport: null,
+  simulationReport: null,
+  simOptions: {
+    pinchRole: 'AUTO',
+    banWaveIntensity: 'AGGRESSIVE',
+    voidgrubPriority: true
+  },
+  activeScenarioId: null,
+  selectedMatrixCell: null,
   roleFilter: 'ALL',
   searchQuery: ''
 };
@@ -88,6 +97,22 @@ const el = {
   btnUploadGrid: document.getElementById('btn-upload-grid'),
   highestPressurePill: document.getElementById('highest-pressure-pill'),
   poolFatigueGrid: document.getElementById('pool-fatigue-grid'),
+  firstCollapsePill: document.getElementById('first-collapse-pill'),
+  seriesDeltaPill: document.getElementById('series-delta-pill'),
+  simPinchGroup: document.getElementById('sim-pinch-group'),
+  simIntensityGroup: document.getElementById('sim-intensity-group'),
+  simVoidgrubToggle: document.getElementById('sim-voidgrub-toggle'),
+  simVoidgrubLabel: document.getElementById('sim-voidgrub-label'),
+  simScenarioChips: document.getElementById('sim-scenario-chips'),
+  simSubtitle: document.getElementById('sim-subtitle'),
+  simLeverSummaryPill: document.getElementById('sim-lever-summary-pill'),
+  simStandardCard: document.getElementById('sim-standard-card'),
+  simFearlessCard: document.getElementById('sim-fearless-card'),
+  simCurveEdgePill: document.getElementById('sim-curve-edge-pill'),
+  simWinCurve: document.getElementById('sim-win-curve'),
+  simWinBrief: document.getElementById('sim-win-brief'),
+  collapseMatrixTable: document.getElementById('collapse-matrix-table'),
+  matrixInspector: document.getElementById('matrix-inspector'),
   toast: document.getElementById('toast')
 };
 
@@ -157,10 +182,31 @@ function recomputeAndRender() {
     activeSide: 'blue'
   });
 
+  state.simulationReport = simulateSeriesDelta({
+    series: state.series,
+    macroReport: state.macroReport,
+    squeezeReport: state.squeezeReport,
+    options: state.simOptions
+  });
+
+  // Default or clamp selected matrix cell to valid role & game bounds
+  const maxGames = state.simulationReport.matrix.maxGames;
+  const fc = state.simulationReport.matrix.summary.firstCollapse;
+  if (
+    !state.selectedMatrixCell ||
+    state.selectedMatrixCell.gameIndex >= maxGames ||
+    !ROLE_LABELS.includes(state.selectedMatrixCell.role)
+  ) {
+    state.selectedMatrixCell = fc
+      ? { role: fc.role, gameIndex: fc.gameIndex }
+      : { role: state.simulationReport.options.effectivePinchRole, gameIndex: Math.min(maxGames - 1, 1) };
+  }
+
   renderHeroKpis();
   renderSeriesControls();
   renderDraftDesk();
   renderRecommendations();
+  renderSeriesSimulator();
   renderMacroSection();
   renderPoolFatigue();
 }
@@ -435,6 +481,327 @@ function renderRecommendations() {
   });
 }
 
+function formatSigned(val, suffix = '') {
+  const sign = val >= 0 ? '+' : '';
+  return `${sign}${val}${suffix}`;
+}
+
+function renderPortraitStrip(ids, { locked = false, emptyText = 'None' } = {}) {
+  if (!ids || ids.length === 0) {
+    return `<span style="font-size: 11.5px; color: var(--ink-muted);">${emptyText}</span>`;
+  }
+  return ids
+    .map((id) => {
+      const c = CHAMPION_BY_ID[id];
+      if (!c) return '';
+      return `<div class="mini-portrait ${locked ? 'locked' : ''}" title="${c.name}${locked ? ' (Fearless Locked / Banned)' : ''}"><img src="${c.asset}" alt="${c.name}" /></div>`;
+    })
+    .join('');
+}
+
+function renderMatrixInspector() {
+  const sim = state.simulationReport;
+  if (!sim || !el.matrixInspector) return;
+  const sel = state.selectedMatrixCell || { role: 'MID', gameIndex: 0 };
+  const row = sim.matrix.rows.find((r) => r.role === sel.role) || sim.matrix.rows[0];
+  const cell = row.cells[sel.gameIndex] || row.cells[0];
+
+  const badgeClass =
+    cell.collapseState === 'CRITICAL_SQUEEZE' || cell.collapseState === 'EXHAUSTED'
+      ? 'pill-crimson'
+      : cell.collapseState === 'SQUEEZED' || cell.collapseState === 'STRAINED'
+      ? 'pill-brass'
+      : 'pill-emerald';
+
+  const edgeText =
+    cell.advantageDelta > 0
+      ? `${state.series.blueTeam} +${cell.advantageDelta} pool edge`
+      : cell.advantageDelta < 0
+      ? `${state.series.redTeam} +${Math.abs(cell.advantageDelta)} pool edge`
+      : 'Even pool depth';
+
+  const lockedOrBanned = [...new Set([...cell.lockedInRoleIds, ...cell.targetedBanIds])];
+
+  el.matrixInspector.innerHTML = `
+    <div>
+      <div class="inspector-col-title">Selected Matrix Cell Inspector</div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <strong style="font-family: var(--font-heading); font-size: 16px;">${cell.role} · Game ${cell.gameNumber}</strong>
+        <span class="pill ${badgeClass}">${cell.collapseLabel}</span>
+        ${cell.isFirstCollapse ? '<span class="pill pill-crimson">1ST COLLAPSE BREAKPOINT</span>' : ''}
+        <span class="pill pill-obsidian">${edgeText}</span>
+      </div>
+      <div style="font-size: 12.5px; color: var(--ink-secondary); line-height: 1.45;">
+        <strong>${cell.c9PlayerName}</strong> (${cell.c9ComfortRemaining}/${cell.c9ComfortTotal} comfort) vs
+        <strong>${cell.oppPlayerName}</strong> (${cell.oppComfortRemaining}/${cell.oppComfortTotal} comfort · ${cell.oppMetaRemaining}/${cell.oppMetaTotal} meta open).
+      </div>
+      <p style="margin: 8px 0 0; font-size: 12px; color: var(--ink-secondary);">${cell.coachNote}</p>
+    </div>
+
+    <div>
+      <div class="inspector-col-title">Locked / Banned in ${cell.role} Entering G${cell.gameNumber} (${lockedOrBanned.length})</div>
+      <div class="mini-portraits">
+        ${renderPortraitStrip(lockedOrBanned, { locked: true, emptyText: 'No role lockouts entering Game 1' })}
+      </div>
+      ${
+        cell.targetedBanIds.length > 0
+          ? `<div style="margin-top: 6px; font-family: var(--font-mono); font-size: 10.5px; color: var(--crimson);">Includes ${cell.targetedBanIds.length} active pinch ban(s): ${cell.targetedBanIds.map((id) => CHAMPION_BY_ID[id]?.name || id).join(', ')}</div>`
+          : ''
+      }
+    </div>
+
+    <div>
+      <div class="inspector-col-title">${cell.oppPlayerName} Remaining Comfort (${cell.oppRemainingComfortIds.length}) &amp; Open Meta (${cell.metaRemainingIds.length})</div>
+      <div class="mini-portraits" style="margin-bottom: 8px;">
+        ${renderPortraitStrip(cell.oppRemainingComfortIds, { emptyText: '0 scouted comfort picks remaining!' })}
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-muted);">
+        Open ${cell.role} Meta: ${cell.metaRemainingIds.map((id) => CHAMPION_BY_ID[id]?.name || id).join(', ') || 'EXHAUSTED'}
+      </div>
+    </div>
+  `;
+}
+
+function renderSeriesSimulator() {
+  const sim = state.simulationReport;
+  if (!sim || !el.collapseMatrixTable) return;
+
+  const { comparison, matrix, perGameWinCurve, winConditionBrief, options } = sim;
+  const fc = matrix.summary.firstCollapse;
+
+  // Header summary pills
+  el.firstCollapsePill.textContent = fc
+    ? `1st Collapse: ${fc.role} (${fc.playerName}) · G${fc.gameNumber}`
+    : `No Critical Collapse Projected (${matrix.format})`;
+  el.seriesDeltaPill.textContent = `Series Win Δ: ${formatSigned(comparison.delta.seriesWinProbPct, '%')}`;
+
+  // Sync coaching lever controls
+  el.simPinchGroup.querySelectorAll('.sim-seg-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.pinchRole === state.simOptions.pinchRole);
+  });
+  el.simIntensityGroup.querySelectorAll('.sim-seg-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.intensity === state.simOptions.banWaveIntensity);
+  });
+  el.simVoidgrubToggle.classList.toggle('active', state.simOptions.voidgrubPriority);
+  el.simVoidgrubToggle.setAttribute('aria-pressed', String(state.simOptions.voidgrubPriority));
+  el.simVoidgrubLabel.textContent = state.simOptions.voidgrubPriority ? 'Priority ON' : 'Priority OFF';
+
+  // Scenario chips
+  el.simScenarioChips.innerHTML =
+    `<span class="sim-lever-label" style="margin-right: 4px;">Scenarios:</span>` +
+    SIMULATOR_SCENARIOS.map(
+      (sc) =>
+        `<button class="scenario-chip ${state.activeScenarioId === sc.id ? 'active' : ''}" data-scenario-id="${sc.id}" title="${sc.description}" type="button">${sc.label}</button>`
+    ).join('');
+
+  el.simScenarioChips.querySelectorAll('.scenario-chip').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sc = SIMULATOR_SCENARIOS.find((item) => item.id === btn.dataset.scenarioId);
+      if (!sc) return;
+      state.activeScenarioId = sc.id;
+      state.simOptions = {
+        pinchRole: sc.pinchRole,
+        banWaveIntensity: sc.banWaveIntensity,
+        voidgrubPriority: sc.voidgrubPriority
+      };
+      state.selectedMatrixCell = null;
+      recomputeAndRender();
+      showToast(`Applied simulator preset: ${sc.label}`);
+    });
+  });
+
+  // Subtitle & lever pill
+  el.simSubtitle.textContent = `Deterministic ${matrix.format} projection for ${state.series.blueTeam} vs ${state.series.redTeam} (${matrix.summary.totalActiveLockouts} live Fearless lockouts active).`;
+  el.simLeverSummaryPill.textContent = `Pinch: ${options.effectivePinchRole} · ${options.banWaveIntensity.replace('_', '-')} · Grubs ${options.voidgrubPriority ? 'ON' : 'OFF'}`;
+
+  // Side-by-Side Plan Cards
+  const std = comparison.standard;
+  const fl = comparison.fearless;
+  const d = comparison.delta;
+
+  el.simStandardCard.innerHTML = `
+    <div class="plan-head">
+      <h4 class="plan-title">${std.planName}</h4>
+      <span class="pill">Baseline · No Lockouts</span>
+    </div>
+    <div class="plan-hero-metric">
+      <span class="plan-big-num">${std.seriesWinProbPct}%</span>
+      <span style="font-size: 12px; color: var(--ink-muted);">Projected ${state.series.blueTeam} ${matrix.format} Win Equity</span>
+    </div>
+    <div class="plan-metrics-grid">
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">${comparison.lateSeriesLabel} Edge</div>
+        <div class="plan-stat-val-row"><span class="plan-stat-val">${formatSigned(std.lateSeriesAdvantagePct, '%')}</span></div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">Gold@15 Baseline</div>
+        <div class="plan-stat-val-row"><span class="plan-stat-val">${formatGold(std.projectedGoldAt15)}</span></div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">Voidgrubs Synergy</div>
+        <div class="plan-stat-val-row"><span class="plan-stat-val">${std.voidgrubsSynergyPct}%</span></div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">Opp Comfort Attrition</div>
+        <div class="plan-stat-val-row"><span class="plan-stat-val">${std.oppComfortAttritionPct}%</span></div>
+      </div>
+    </div>
+  `;
+
+  el.simFearlessCard.innerHTML = `
+    <div class="plan-head">
+      <h4 class="plan-title">${fl.planName}</h4>
+      <span class="pill" style="background: rgba(230,196,124,0.16); color: #f6dca4; border-color: rgba(230,196,124,0.38);">Recommended C9 Plan</span>
+    </div>
+    <div class="plan-hero-metric">
+      <span class="plan-big-num">${fl.seriesWinProbPct}%</span>
+      <span class="delta-badge">${formatSigned(d.seriesWinProbPct, '%')} vs Standard</span>
+    </div>
+    <div class="plan-metrics-grid">
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">${comparison.lateSeriesLabel} Edge</div>
+        <div class="plan-stat-val-row">
+          <span class="plan-stat-val">${formatSigned(fl.lateSeriesAdvantagePct, '%')}</span>
+          <span class="plan-stat-delta">${formatSigned(d.lateSeriesAdvantagePct, '%')}</span>
+        </div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">Projected Gold@15</div>
+        <div class="plan-stat-val-row">
+          <span class="plan-stat-val">${formatGold(fl.projectedGoldAt15)}</span>
+          <span class="plan-stat-delta">${formatGold(d.projectedGoldAt15)}</span>
+        </div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">Voidgrubs Synergy</div>
+        <div class="plan-stat-val-row">
+          <span class="plan-stat-val">${fl.voidgrubsSynergyPct}%</span>
+          <span class="plan-stat-delta">${formatSigned(d.voidgrubsSynergyPct, '%')}</span>
+        </div>
+      </div>
+      <div class="plan-stat">
+        <div class="plan-stat-lbl">Opp Comfort Attrition</div>
+        <div class="plan-stat-val-row">
+          <span class="plan-stat-val">${fl.oppComfortAttritionPct}%</span>
+          <span class="plan-stat-delta">${formatSigned(d.oppComfortAttritionPct, '%')}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Game-by-game win probability trajectory
+  const finalStep = perGameWinCurve[perGameWinCurve.length - 1];
+  el.simCurveEdgePill.textContent = `${finalStep.label} Surge: ${formatSigned(finalStep.deltaPct, '%')}`;
+  el.simWinCurve.innerHTML = perGameWinCurve
+    .map((pt) => {
+      const stdH = Math.max(18, Math.round((pt.standardWinPct / 100) * 82));
+      const flH = Math.max(18, Math.round((pt.fearlessWinPct / 100) * 82));
+      return `
+        <div class="curve-col" title="${pt.label}: Standard ${pt.standardWinPct}% vs Fearless ${pt.fearlessWinPct}% (${formatSigned(pt.deltaPct, '%')})">
+          <span class="curve-delta-lbl">${formatSigned(pt.deltaPct, '%')}</span>
+          <div class="curve-pair">
+            <div class="curve-bar-std" style="height: ${stdH}px;"></div>
+            <div class="curve-bar-fl" style="height: ${flH}px;"></div>
+          </div>
+          <span class="curve-game-lbl">${pt.label} · ${pt.fearlessWinPct}%</span>
+        </div>`;
+    })
+    .join('');
+
+  el.simWinBrief.innerHTML = winConditionBrief.map((item) => `<li>${item}</li>`).join('');
+
+  // Render Game 1->5 (or 1->3) Collapse Matrix Table
+  const thead = `
+    <thead>
+      <tr>
+        <th>Role Matchup (C9 vs ${state.macroReport.opponentTeam.tag})</th>
+        ${matrix.gameHeaders
+          .map(
+            (hdr, idx) =>
+              `<th class="${idx === matrix.currentGameIndex ? 'is-current-col' : ''}">${hdr}${idx === matrix.currentGameIndex ? ' · LIVE' : idx > matrix.currentGameIndex ? ' · PROJ' : ''}</th>`
+          )
+          .join('')}
+      </tr>
+    </thead>`;
+
+  const tbody = `
+    <tbody>
+      ${matrix.rows
+        .map((row) => {
+          const cellsHtml = row.cells
+            .map((cell) => {
+              const isSelected =
+                state.selectedMatrixCell &&
+                state.selectedMatrixCell.role === cell.role &&
+                state.selectedMatrixCell.gameIndex === cell.gameIndex;
+              const cls = [
+                'matrix-cell-btn',
+                `state-${cell.collapseState}`,
+                cell.isFirstCollapse ? 'first-collapse' : '',
+                isSelected ? 'selected' : ''
+              ]
+                .filter(Boolean)
+                .join(' ');
+              const oppComfortTxt =
+                cell.oppComfortTotal > 0 ? `${cell.oppComfortRemaining}/${cell.oppComfortTotal}` : 'N/A';
+              return `
+                <td>
+                  <button
+                    class="${cls}"
+                    data-matrix-role="${cell.role}"
+                    data-matrix-game="${cell.gameIndex}"
+                    type="button"
+                    aria-pressed="${isSelected}"
+                  >
+                    <div class="matrix-cell-status-row">
+                      <span class="matrix-state-chip">${cell.collapseLabel}</span>
+                      ${cell.isFirstCollapse ? '<span class="first-collapse-badge">1ST</span>' : ''}
+                    </div>
+                    <div class="matrix-counts">
+                      <span>OPP ${oppComfortTxt}</span>
+                      <span style="color: var(--emerald);">C9 ${cell.c9ComfortRemaining}/${cell.c9ComfortTotal}</span>
+                    </div>
+                    <div class="matrix-meta-sub">${cell.oppMetaRemaining}/${cell.oppMetaTotal} meta · ${cell.lockedInRoleIds.length} locked</div>
+                  </button>
+                </td>`;
+            })
+            .join('');
+
+          return `
+            <tr>
+              <td class="matrix-role-cell">
+                <div class="matrix-role-top">
+                  <span class="matrix-role-tag">${row.role}</span>
+                  ${row.isPinchTarget ? '<span class="pill pill-crimson" style="padding: 1px 7px; font-size: 9.5px;">PINCH</span>' : ''}
+                </div>
+                <div class="matrix-role-matchup"><strong>${row.c9PlayerName}</strong> vs ${row.oppPlayerName}</div>
+              </td>
+              ${cellsHtml}
+            </tr>`;
+        })
+        .join('')}
+    </tbody>`;
+
+  el.collapseMatrixTable.innerHTML = thead + tbody;
+
+  el.collapseMatrixTable.querySelectorAll('.matrix-cell-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.selectedMatrixCell = {
+        role: btn.dataset.matrixRole,
+        gameIndex: Number(btn.dataset.matrixGame)
+      };
+      el.collapseMatrixTable.querySelectorAll('.matrix-cell-btn').forEach((other) => {
+        const active = other === btn;
+        other.classList.toggle('selected', active);
+        other.setAttribute('aria-pressed', String(active));
+      });
+      renderMatrixInspector();
+    });
+  });
+
+  renderMatrixInspector();
+}
+
 function renderMacroSection() {
   const m = state.macroReport;
   el.gridSeriesIdPill.textContent = `GRID ID · ${m.seriesId}`;
@@ -626,12 +993,40 @@ function bindEvents() {
     renderDraftDesk();
   });
 
+  // Series Simulator Coaching Levers
+  el.simPinchGroup.querySelectorAll('.sim-seg-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.simOptions.pinchRole = btn.dataset.pinchRole;
+      state.activeScenarioId = null;
+      state.selectedMatrixCell = null;
+      recomputeAndRender();
+      showToast(`Target pinch role set to ${btn.dataset.pinchRole}`);
+    });
+  });
+
+  el.simIntensityGroup.querySelectorAll('.sim-seg-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.simOptions.banWaveIntensity = btn.dataset.intensity;
+      state.activeScenarioId = null;
+      recomputeAndRender();
+      showToast(`Ban-wave intensity: ${btn.textContent.trim()}`);
+    });
+  });
+
+  el.simVoidgrubToggle.addEventListener('click', () => {
+    state.simOptions.voidgrubPriority = !state.simOptions.voidgrubPriority;
+    state.activeScenarioId = null;
+    recomputeAndRender();
+    showToast(`6:00 Voidgrub priority ${state.simOptions.voidgrubPriority ? 'enabled' : 'disabled'}`);
+  });
+
   // Dossier Exports
   el.btnExportMd.addEventListener('click', () => {
     const md = generateDossierMarkdown({
       series: state.series,
       macroReport: state.macroReport,
-      squeezeReport: state.squeezeReport
+      squeezeReport: state.squeezeReport,
+      simulationReport: state.simulationReport
     });
     downloadFile(`c9-draftforge-dossier-${state.macroReport.seriesId}.md`, md, 'text/markdown;charset=utf-8');
     showToast('Exported Coach Draft & Macro Dossier (.md)');
@@ -641,7 +1036,8 @@ function bindEvents() {
     const json = generateDossierJson({
       series: state.series,
       macroReport: state.macroReport,
-      squeezeReport: state.squeezeReport
+      squeezeReport: state.squeezeReport,
+      simulationReport: state.simulationReport
     });
     downloadFile(`c9-draftforge-bundle-${state.macroReport.seriesId}.json`, json, 'application/json;charset=utf-8');
     showToast('Exported Coach Draft & Macro Bundle (.json)');
